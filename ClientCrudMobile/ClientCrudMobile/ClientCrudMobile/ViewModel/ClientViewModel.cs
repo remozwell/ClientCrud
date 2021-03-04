@@ -108,6 +108,30 @@ namespace ClientCrudMobile.ViewModel
 
             }
         }
+
+        private string isClientModelOk(ClientModel cm)
+        {
+            string _return = string.Empty;
+            int edad = 0;
+            if (string.IsNullOrEmpty(cm.nombre))
+            {
+                _return = "El campo nombre esta vacio";
+            }
+            else if (string.IsNullOrEmpty(cm.apellido))
+            {
+                _return = "El campo apellido esta vacio";
+            }
+            else if (!int.TryParse(cm.edad, out edad) && edad <= 0)
+            {
+                _return = "Favor ponga una edad valida";
+            }
+            else if (cm.direcciones == null || cm.direcciones.Count == 0)
+            {
+                _return = "Debe agregar al menos una direccion";
+            }
+            return _return;
+        }
+
         #endregion
 
 
@@ -120,10 +144,19 @@ namespace ClientCrudMobile.ViewModel
             await App.Current.MainPage.Navigation.PushAsync(new ClientDetail());
         }
 
+
         protected async void mtAgregarEditarCliente()
         {
             try
             {
+                string messagge = isClientModelOk(SelectedClient);
+                if (!string.IsNullOrEmpty(messagge))
+                {
+                    await App.Current.MainPage.DisplayAlert("", messagge, "ok");
+                    return;
+                }
+
+
                 var instanceClientList = ClientList.ToList();
                 if (selectedClient.id == 0)
                 {
