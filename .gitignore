@@ -9,3 +9,5 @@
 /ClientCrudMobile/ClientCrudMobile/ClientCrudMobile.Android/bin/Debug
 /ClientCrudMobile/ClientCrudMobile/ClientCrudMobile.Android/obj
 /ClientCrudMobile/ClientCrudMobile/ClientCrudMobile.iOS/obj
+/ClientCrudMobile/ClientApi/bin
+/ClientCrudMobile/ClientApi/obj/Debug

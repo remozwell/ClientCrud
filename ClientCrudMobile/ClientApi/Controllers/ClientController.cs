@@ -13,7 +13,7 @@ namespace ClientApi.Controllers
 {
 
     [APIAuthorizeKey]
-    [RoutePrefix("api/Person")]
+    [RoutePrefix("api")]
     public class ClientController : ApiController
     {
         public DataStore store = new DataStore(System.Configuration.ConfigurationManager.AppSettings["ClientDB"].ToString());
@@ -117,7 +117,7 @@ namespace ClientApi.Controllers
         {
             var collection = store.GetCollection<ClientModel>();
             var dbItem = collection.AsQueryable().FirstOrDefault(x => x.id == client.id);
-            if(dbItem != null)
+            if (dbItem != null)
             {
                 collection.UpdateOne(client.id, client);
             }
@@ -137,7 +137,7 @@ namespace ClientApi.Controllers
             var dbItem = collection.AsQueryable().FirstOrDefault(x => x.id == id);
             if (dbItem != null)
             {
-               return collection.Remove(dbItem);
+                return collection.Remove(dbItem);
             }
             else
             {
