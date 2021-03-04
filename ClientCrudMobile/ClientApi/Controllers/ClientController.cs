@@ -32,6 +32,19 @@ namespace ClientApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
             }
         }
+        [HttpGet]
+        [Route("Clients")]
+        public HttpResponseMessage mtGetClient(int id)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, getClient(id));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
+            }
+        }
 
         [HttpPost]
         [Route("Clients")]
@@ -96,6 +109,19 @@ namespace ClientApi.Controllers
 
         }
 
+        private ClientModel getClient(int id)
+        {
+            var client = store.GetCollection<ClientModel>().AsQueryable().FirstOrDefault(x=> x.id == id);
+            if (client != null)
+            {
+                return client;
+            }
+            else
+            {
+                return null;
+            }
+
+        }
 
         private ClientModel saveClient(ClientModel client)
         {
@@ -133,16 +159,9 @@ namespace ClientApi.Controllers
 
         private bool deleteClient(int id)
         {
-            var collection = store.GetCollection<ClientModel>().AsQueryable().ToList();
-            var dbItem = collection.AsQueryable().FirstOrDefault(x => x.id == id);
-            if (dbItem != null)
-            {
-                return collection.Remove(dbItem);
-            }
-            else
-            {
-                throw new Exception(message: "Esta persona no existe en la base de datos");
-            }
+            var collection = store.GetCollection<ClientModel>();
+            return collection.DeleteOne(x=>x.id == id);
+           
 
         }
         #endregion
