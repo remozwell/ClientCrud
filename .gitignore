@@ -1,0 +1,11 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/ClientCrudMobile/.vs/ClientCrudMobile/v16/.suo
+/ClientCrudMobile/ClientCrudMobile/ClientCrudMobile/bin/Debug/netstandard2.0
+/ClientCrudMobile/ClientCrudMobile/ClientCrudMobile/obj
+/ClientCrudMobile/ClientCrudMobile/ClientCrudMobile.Android/bin/Debug
+/ClientCrudMobile/ClientCrudMobile/ClientCrudMobile.Android/obj
+/ClientCrudMobile/ClientCrudMobile/ClientCrudMobile.iOS/obj

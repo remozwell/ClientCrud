@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ClientCrudMobile.Views.ClientDetail"
+             Title="Detalle">
+    <ContentPage.Content>
+        <StackLayout Style="{StaticResource mainContent}">
+            <Label Text="nombre" Style="{StaticResource title}"/>
+            <Entry Text="{Binding SelectedClient.nombre}"/>
+            
+            <Label Text="nombre" Style="{StaticResource title}"/>
+            <Entry Text="{Binding SelectedClient.apellido}"/>
+            
+            <Label Text="nombre" Style="{StaticResource title}"/>
+            <Entry Text="{Binding SelectedClient.edad}"/>
+
+            <StackLayout>
+                <ListView x:Name="Direcciones" ItemsSource="{Binding SelectedClient.direcciones}" HasUnevenRows="True">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <StackLayout>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="90"/>
+                                            <ColumnDefinition Width="90"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Grid.Column="0" Text="{Binding .}"/>
+                                        <Button Grid.Column="1" Text="Editar" Command="{Binding Path=BindingContext.editarDireccionSelectedCommand, Source={x:Reference Direcciones}}" CommandParameter="{Binding .}"/>
+                                        <Button Grid.Column="2" Text="borrar" Command="{Binding Path=BindingContext.borrarDireccionSelectedCommand, Source={x:Reference Direcciones}}" CommandParameter="{Binding .}"/>
+                                    </Grid>
+                                </StackLayout>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <Button Text="Agregar direccion" Command="{Binding agregarDireccionSelectedCommand}"/>
+            </StackLayout>
+
+            <Button Style="{StaticResource PrimaryButton}" Text="Guardar" Command="{Binding guardarEditarClienteCommand}"/>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

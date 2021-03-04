@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ClientCrudMobile.Views.Clientes"
+             Title="Clientes">
+    <ContentPage.Content>
+        <StackLayout Style="{StaticResource mainContent}">
+            <ListView ItemsSource="{Binding ClientVM.ClientList}" SelectedItem="{Binding ClientVM.SelectedClient, Mode=TwoWay}" ItemTapped="Client_ItemTapped" HasUnevenRows="True">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout Padding="5">
+                                <Label FontAttributes="Bold">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding nombre}" />
+                                            <Span Text=" " />
+                                            <Span Text="{Binding apellido}"/>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                                <Label>
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="Edad:" />
+                                            <Span Text=" " />
+                                            <Span Text="{Binding edad}"/>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
