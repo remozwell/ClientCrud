@@ -7,12 +7,12 @@
         <StackLayout Style="{StaticResource mainContent}">
             <Label Text="nombre" Style="{StaticResource title}"/>
             <Entry Text="{Binding SelectedClient.nombre}"/>
-            
-            <Label Text="nombre" Style="{StaticResource title}"/>
+
+            <Label Text="apellido" Style="{StaticResource title}"/>
             <Entry Text="{Binding SelectedClient.apellido}"/>
-            
-            <Label Text="nombre" Style="{StaticResource title}"/>
-            <Entry Text="{Binding SelectedClient.edad}"/>
+
+            <Label Text="edad" Style="{StaticResource title}"/>
+            <Entry Text="{Binding SelectedClient.edad}" Keyboard="Telephone"/>
 
             <StackLayout>
                 <ListView x:Name="Direcciones" ItemsSource="{Binding SelectedClient.direcciones}" HasUnevenRows="True">
@@ -38,7 +38,11 @@
                 <Button Text="Agregar direccion" Command="{Binding agregarDireccionSelectedCommand}"/>
             </StackLayout>
 
-            <Button Style="{StaticResource PrimaryButton}" Text="Guardar" Command="{Binding guardarEditarClienteCommand}"/>
+            <StackLayout Orientation="Vertical">
+                <Button Style="{StaticResource PrimaryButton}" Text="Guardar" Command="{Binding guardarEditarClienteCommand}"/>
+                <Button Style="{StaticResource RedButton}" Text="Borrar" Command="{Binding borrarClienteCommand}"/>
+            </StackLayout>
+
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 using Newtonsoft.Json;
+using ClientCrudMobile.Views;
 
 namespace ClientCrudMobile.ViewModel
 {
@@ -45,11 +46,14 @@ namespace ClientCrudMobile.ViewModel
 
 
 
-
+        #region comandos
         public Command editarDireccionSelectedCommand { get; set; }
         public Command borrarDireccionSelectedCommand { get; set; }
         public Command agregarDireccionSelectedCommand { get; set; }
+        public Command nuevoClienteCommand { get; set; }
         public Command guardarEditarClienteCommand { get; set; }
+        public Command borrarClienteCommand { get; set; }
+        #endregion
 
         public ClientViewModel()
         {
@@ -64,7 +68,9 @@ namespace ClientCrudMobile.ViewModel
                 editarDireccionSelectedCommand = new Command<string>((direccion) => mtEditarDireccion(direccion));
                 borrarDireccionSelectedCommand = new Command<string>((direccion) => mtBorrarDireccion(direccion));
                 agregarDireccionSelectedCommand = new Command(mtAgregarDireccion);
+                nuevoClienteCommand = new Command(mtNuevoClient);
                 guardarEditarClienteCommand = new Command(mtAgregarEditarCliente);
+                borrarClienteCommand = new Command(mtBorrarCliente);
 
             }
             catch (Exception ex)
@@ -74,100 +80,207 @@ namespace ClientCrudMobile.ViewModel
         }
 
 
+        #region metodos
         //Obtener el listado de las peliculas destacadas de la semana, vienen en grupo de paginas manejadas por el parametro
         public async void GetClientsList()
         {
-            List<ClientModel> Clientes = await App.WebService.GetAsync<List<ClientModel>>($"{App.WebService.baseUrl}clientes/");
-            if (Clientes.Count > 0)
+            try
             {
-                ClientList = Clientes;
-            }
+                RequestHandler<List<ClientModel>> response = await App.WebService.GetAsync<List<ClientModel>>($"{App.WebService.baseUrl}clientes/");
+                if (response.isSuccessRequest)
+                {
+                    var Clientes = response.RequestResult;
+                    if (Clientes.Count > 0)
+                    {
+                        ClientList = Clientes;
+                    }
+                }
+                else
+                {
+                    await App.Current.MainPage.DisplayAlert("", "No se pudo obtener la lista de clientes", "ok");
 
+                }
+
+            }
+            catch (Exception ex)
+            {
+                await App.Current.MainPage.DisplayAlert("", "Ocurrio un problema realizando la accion", "ok");
+
+            }
+        }
+        #endregion
+
+
+
+
+        #region metodos de commandos
+        protected async void mtNuevoClient()
+        {
+            selectedClient = new ClientModel();
+            await App.Current.MainPage.Navigation.PushAsync(new ClientDetail());
         }
 
-
-
-
-
-        #region commandos
         protected async void mtAgregarEditarCliente()
         {
-            if (selectedClient.id == 0)
+            try
             {
-                string json = JsonConvert.SerializeObject(selectedClient);
-                var response = await App.WebService.PostAsync<ClientModel>($"{App.WebService.baseUrl}clientes/", json);
-                if (response != null)
+                var instanceClientList = ClientList.ToList();
+                if (selectedClient.id == 0)
                 {
-                    selectedClient.id = response.id;
-                    ClientList.Add(selectedClient);
-                    OnPropertyChanged();
-                    await App.Current.MainPage.DisplayAlert("", "Se guardo correctamente", "ok");
-                }
-            }
-            else
-            {
-                string json = JsonConvert.SerializeObject(selectedClient);
-                var response = await App.WebService.PuttAsync<ClientModel>($"{App.WebService.baseUrl}clientes/", json);
-                if (response != null)
-                {
-                    int index = ClientList.FindIndex(x => x.id == response.id);
-                    ClientList[index] = response;
-                    OnPropertyChanged();
-                    await App.Current.MainPage.DisplayAlert("", "Se actualizo correctamente", "ok");
-                }
-            }
+                    string json = JsonConvert.SerializeObject(selectedClient);
+                    var response = await App.WebService.PostAsync<ClientModel>($"{App.WebService.baseUrl}clientes/", json);
+                    if (response.isSuccessRequest)
+                    {
+                        var result = response.RequestResult;
+                        if (result != null)
+                        {
+                            selectedClient = result;
+                            instanceClientList.Add(selectedClient);
+                            ClientList = instanceClientList;
+                            await App.Current.MainPage.Navigation.PopAsync();
+                            await App.Current.MainPage.DisplayAlert("", "Se guardo correctamente", "ok");
+                        }
+                    }
+                    else
+                    {
+                        await App.Current.MainPage.DisplayAlert("", "No se pudo guardar el registro", "ok");
 
+                    }
+                }
+                else
+                {
+                    string json = JsonConvert.SerializeObject(selectedClient);
+                    var response = await App.WebService.PutAsync<ClientModel>($"{App.WebService.baseUrl}clientes/{selectedClient.id}", json);
+                    if (response.isSuccessRequest)
+                    {
+                        var result = response.RequestResult;
+                        if (result != null)
+                        {
+
+                            int index = instanceClientList.FindIndex(x => x.id == result.id);
+                            instanceClientList[index] = result;
+                            ClientList = instanceClientList;
+                            await App.Current.MainPage.Navigation.PopAsync();
+                            await App.Current.MainPage.DisplayAlert("", "Se actualizo correctamente", "ok");
+                        }
+                    }
+                    else
+                    {
+                        await App.Current.MainPage.DisplayAlert("", "No se pudo guardar el registro", "ok");
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                await App.Current.MainPage.DisplayAlert("", "Ocurrio un problema realizando la accion", "ok");
+
+            }
 
         }
 
+        protected async void mtBorrarCliente()
+        {
+            try
+            {
+                if (selectedClient.id > 0)
+                {
+                    bool confirmDelete = await App.Current.MainPage.DisplayAlert("", "Esta seguro de querer borrar este cliente?", "Si", "No");
+                    if (confirmDelete)
+                    {
+                        var response = await App.WebService.DeleteAsync<ClientModel>($"{App.WebService.baseUrl}clientes/{selectedClient.id}");
+                        if (response.isSuccessRequest)
+                        {
+                            ClientList = ClientList.Where(x => x.id != selectedClient.id).ToList();
+                            OnPropertyChanged();
+                            await App.Current.MainPage.Navigation.PopAsync();
+                            await App.Current.MainPage.DisplayAlert("", "Cliente eliminado correctamente", "ok");
+                        }
+                        else
+                        {
+                            await App.Current.MainPage.DisplayAlert("", "No se pudo borrar el registro", "ok");
+
+                        }
+                    }
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                await App.Current.MainPage.DisplayAlert("", "Ocurrio un problema realizando la accion", "ok");
+
+            }
+        }
 
         protected async void mtAgregarDireccion()
         {
-            var instanceCopy = selectedClient.direcciones.ToList();
-            var prompt = await App.Current.MainPage.DisplayPromptAsync("", "Escriba la dirección");
-            if (prompt != null)
+            try
             {
-                if (prompt == "")
+                var instanceCopy = selectedClient.direcciones;
+                if (instanceCopy == null)
                 {
-                    await App.Current.MainPage.DisplayAlert("", "La direccion puesta esta vacia", "Ok");
-                    return;
+                    instanceCopy = new List<string>();
+                }
+                var prompt = await App.Current.MainPage.DisplayPromptAsync("", "Escriba la dirección");
+                if (prompt != null)
+                {
+                    if (prompt == "")
+                    {
+                        await App.Current.MainPage.DisplayAlert("", "La direccion puesta esta vacia", "Ok");
+                        return;
+                    }
+
+                    if (instanceCopy.Any(x => x == prompt))
+                    {
+                        await App.Current.MainPage.DisplayAlert("", "Ya existe esta direción", "Ok");
+                        return;
+                    }
+                    instanceCopy.Add(prompt);
+
+                    selectedClient.direcciones = instanceCopy;
                 }
 
-                if (instanceCopy.Any(x => x == prompt))
-                {
-                    await App.Current.MainPage.DisplayAlert("", "Ya existe esta direción", "Ok");
-                    return;
-                }
-                instanceCopy.Add(prompt);
+            }
+            catch (Exception ex)
+            {
+                await App.Current.MainPage.DisplayAlert("", "Ocurrio un problema realizando la accion", "ok");
 
-                selectedClient.direcciones = instanceCopy;
             }
         }
 
         protected async void mtEditarDireccion(string dir)
         {
-            var instanceCopy = selectedClient.direcciones.ToList();
-            int index = instanceCopy.IndexOf(dir);
-            var prompt = await App.Current.MainPage.DisplayPromptAsync("", "Escriba la dirección", initialValue: dir);
-            if (prompt != null)
+            try
             {
-                if (prompt == "")
+                var instanceCopy = selectedClient.direcciones.ToList();
+                int index = instanceCopy.IndexOf(dir);
+                var prompt = await App.Current.MainPage.DisplayPromptAsync("", "Escriba la dirección", initialValue: dir);
+                if (prompt != null)
                 {
-                    await App.Current.MainPage.DisplayAlert("", "La direccion puesta esta vacia", "Ok");
-                    return;
+                    if (prompt == "")
+                    {
+                        await App.Current.MainPage.DisplayAlert("", "La direccion puesta esta vacia", "Ok");
+                        return;
+                    }
+
+                    if (instanceCopy.Any(x => x == prompt))
+                    {
+                        await App.Current.MainPage.DisplayAlert("", "Ya existe esta direción", "Ok");
+                        return;
+                    }
+
+                    instanceCopy[index] = prompt;
+                    selectedClient.direcciones = instanceCopy;
                 }
 
-                if (instanceCopy.Any(x => x == prompt))
-                {
-                    await App.Current.MainPage.DisplayAlert("", "Ya existe esta direción", "Ok");
-                    return;
-                }
+            }
+            catch (Exception ex)
+            {
+                await App.Current.MainPage.DisplayAlert("", "Ocurrio un problema realizando la accion", "ok");
 
-                instanceCopy[index] = prompt;
-                selectedClient.direcciones = instanceCopy;
             }
         }
-
 
         protected void mtBorrarDireccion(string dir)
         {

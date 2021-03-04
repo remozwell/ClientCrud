@@ -33,6 +33,7 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
+            <Button Text="Nuevo cliente" Command="{Binding ClientVM.nuevoClienteCommand}" Style="{StaticResource PrimaryButton}" />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
